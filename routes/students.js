@@ -5,7 +5,6 @@ const studentsRouter = express.Router();
 
 //handleErrors:
 const handleErrors = (err) => {
-    console.log(err.message, err.code)
     let errors = { name: '', first_name: '', email: '' };
 
     //unique email error handling: duplicate error code
@@ -14,19 +13,14 @@ const handleErrors = (err) => {
         return errors;
     }
 
-
     //validate errors
     if(err.message.includes('Student validation failed')) {
-        console.log(Object.values(err.errors))
         Object.values(err.errors).forEach(({properties}) => {
             errors[properties.path] = properties.message;
         })
     }
     return errors;
 }
-
-
-
 //Read all
 studentsRouter.get("/", async (req, res) => {
     try{
@@ -54,7 +48,7 @@ studentsRouter.post("/", async (req, res) => {
     try {
         const {name, first_name, email} = req.body;
         const response = await Student.create({name, first_name, email});
-        res.json(response);
+        res.status(201).json(response);
     } catch(err) {
         const errors = handleErrors(err);
         if(errors.name.length > 0 || errors.first_name.length > 0 || errors.email.length >0) {
