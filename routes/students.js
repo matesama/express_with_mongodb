@@ -61,11 +61,11 @@ studentsRouter.post("/", async (req, res) => {
     }
 })
 //Update a particular student
-studentsRouter.put("/:id", async (req, res) => {
+studentsRouter.put("/oneUser/:id", async (req, res) => {
     try {
         const {id} = req.params;
         const {name, first_name, email} = req.body;
-        const response = await Student.findByIdAndUpdate(id, {name, first_name, email});
+        const response = await Student.findByIdAndUpdate(id, {name, first_name, email}, {new: true} );
         if(!response) {
             res.status(404).json({error: "not found"});
         }
@@ -79,12 +79,14 @@ studentsRouter.put("/:id", async (req, res) => {
     }
 })
 //Update name John to Bob
-studentsRouter.put("/", async (req, res) => {
+studentsRouter.put("/:name", async (req, res) => {
     try {
-        const response = await Student.updateMany({ name: "John" }, 
-            {$set: { name: "Bob"}});
+        const {name} = req.params;
+        const {newName} = req.body;
+        const response = await Student.updateMany({ name: name }, 
+            {$set: { name: newName }});
         if(response.modifiedCount > 0) {
-            const updatedNames = await Student.find({name: "Bob"});
+            const updatedNames = await Student.find({ name: newName });
             res.json(updatedNames);
         }else{
             res.json("No value got updated");
